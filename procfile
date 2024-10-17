@@ -1,1 +1,1 @@
-web: gunicorn -b 0.0.0.0:$PORT tokenouath:app
+web: gunicorn --bind 0.0.0.0:$PORT gerareuniao:app
