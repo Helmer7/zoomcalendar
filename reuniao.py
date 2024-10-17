@@ -1,5 +1,15 @@
 import requests
 import json
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "Hello, Zoom Webhook!"
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
 
 
 url = "https://api.zoom.us/v2/users/me/meetings"
