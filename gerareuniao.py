@@ -1,6 +1,6 @@
 import requests
 from requests.auth import HTTPBasicAuth
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify
 import datetime
 import os
 
@@ -8,7 +8,7 @@ import os
 access_token = None
 token_expiration = None
 
-client_id = os.getenv("ZOOM_CLIENT_ID", "zjm3XiLSpSR9FSjn4ebqA")  # Agora pode usar variáveis de ambiente
+client_id = os.getenv("ZOOM_CLIENT_ID", "zjm3XiLSpSR9FSjn4ebqA")
 client_secret = os.getenv("ZOOM_CLIENT_SECRET", "MkQzk4nQUO8WjwGg4z8bN15u3uNCG5tB")
 account_id = os.getenv("ZOOM_ACCOUNT_ID", "JoFnTUNXSBacV9W36l3lZA")
 
@@ -75,36 +75,18 @@ def criar_reuniao_zoom(topic, start_time, duration, agenda):
         print(f"Erro ao criar reunião: {response.status_code} - {response.text}")
         raise Exception(f"Erro ao criar reunião: {response.status_code} - {response.text}")
 
-# Rota para criar uma reunião via URL
-@app.route('/criar_reuniao', methods=['GET'])
-def criar_reuniao():
+# Função para criar uma reunião automaticamente ao iniciar o app
+@app.route('/')
+def criar_reuniao_automatica():
     try:
         # Exemplos de parâmetros
         topic = "Reunião Automática"
-        start_time = "2024-10-18T15:00:00"
+        start_time = (datetime.datetime.now() + datetime.timedelta(minutes=5)).isoformat()
         duration = 30
-        agenda = "Agenda da reunião"
+        agenda = "Agenda da reunião automática"
         
         join_url = criar_reuniao_zoom(topic, start_time, duration, agenda)
         return jsonify({"join_url": join_url})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-# Rota para receber notificações do Zoom via Webhook
-@app.route('/zoom_webhook', methods=['POST'])
-def zoom_webhook():
-    try:
-        dados = request.json
-        if dados['event'] == "meeting.created":
-            topic = dados['payload']['object']['topic']
-            start_time = dados['payload']['object']['start_time']
-            duration = dados['payload']['object']['duration']
-            agenda = "Reunião criada via webhook"
-            
-            # Cria uma nova reunião usando os dados recebidos
-            join_url = criar_reuniao_zoom(topic, start_time, duration, agenda)
-            return jsonify({"join_url": join_url})
-        return jsonify({"message": "Evento não tratado"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -112,4 +94,3 @@ def zoom_webhook():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))  # A Vercel usa a variável de ambiente "PORT"
     app.run(host='0.0.0.0', port=port)
-
