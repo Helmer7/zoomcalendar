@@ -1,6 +1,6 @@
 import requests
 from requests.auth import HTTPBasicAuth
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import datetime
 
 # Variáveis Globais
@@ -46,17 +46,17 @@ def verificar_token():
         gerar_token()
 
 # Função para criar a reunião no Zoom
-def criar_reuniao_zoom():
+def criar_reuniao_zoom(topic, start_time, duration, agenda):
     verificar_token()  # Garante que o token é válido
     url = "https://api.zoom.us/v2/users/me/meetings"
     
     dados_reuniao = {
-        "topic": "Reunião Automática",
+        "topic": topic,
         "type": 2,
-        "start_time": "2024-10-18T15:00:00",  # Exemplo de data e hora
-        "duration": 30,
+        "start_time": start_time,  # Data e hora fornecidas
+        "duration": duration,
         "timezone": "America/Sao_Paulo",
-        "agenda": "Agenda da reunião"
+        "agenda": agenda
     }
 
     headers = {
@@ -78,10 +78,35 @@ def criar_reuniao_zoom():
 @app.route('/criar_reuniao', methods=['GET'])
 def criar_reuniao():
     try:
-        join_url = criar_reuniao_zoom()
+        # Exemplos de parâmetros
+        topic = "Reunião Automática"
+        start_time = "2024-10-18T15:00:00"
+        duration = 30
+        agenda = "Agenda da reunião"
+        
+        join_url = criar_reuniao_zoom(topic, start_time, duration, agenda)
         return jsonify({"join_url": join_url})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# Rota para receber notificações do Zoom via Webhook
+@app.route('/zoom_webhook', methods=['POST'])
+def zoom_webhook():
+    try:
+        dados = request.json
+        if dados['event'] == "meeting.created":
+            topic = dados['payload']['object']['topic']
+            start_time = dados['payload']['object']['start_time']
+            duration = dados['payload']['object']['duration']
+            agenda = "Reunião criada via webhook"
+            
+            # Cria uma nova reunião usando os dados recebidos
+            join_url = criar_reuniao_zoom(topic, start_time, duration, agenda)
+            return jsonify({"join_url": join_url})
+        return jsonify({"message": "Evento não tratado"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
 
 # Rodando o servidor Flask
 if __name__ == '__main__':
