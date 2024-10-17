@@ -5,6 +5,7 @@ import datetime
 import os
 from models import Reuniao, db
 
+
 access_token = None
 token_expiration = None
 
@@ -47,7 +48,17 @@ def verificar_token():
 
 
 def verificar_reuniao_existente(topic, start_time, duration):
-    reuniao_existente = Reuniao.query.filter_by(topic=topic, start_time=start_time, duration=duration).first()
+    
+    start_time_obj = datetime.datetime.fromisoformat(start_time)
+    uma_hora_antes = start_time_obj - datetime.timedelta(hours=1)
+    uma_hora_depois = start_time_obj + datetime.timedelta(hours=1)
+
+    reuniao_existente = Reuniao.query.filter(
+        Reuniao.topic == topic,
+        Reuniao.start_time.between(uma_hora_antes, uma_hora_depois),
+        Reuniao.duration == duration
+    ).first()
+
     return reuniao_existente
 
 
@@ -92,6 +103,7 @@ def criar_reuniao_automatica():
         
         reuniao_existente = verificar_reuniao_existente(topic, start_time, duration)
         if reuniao_existente:
+            print(f"Reunião já existe: {reuniao_existente.join_url}")
             return jsonify({"join_url": reuniao_existente.join_url})
         
         
