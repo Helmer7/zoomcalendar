@@ -1,3 +1,1 @@
-web: python reuniao.py
-web: python tokeouath.py
 web: gunicorn reuniao:app
