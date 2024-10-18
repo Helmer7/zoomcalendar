@@ -3,7 +3,7 @@ from requests.auth import HTTPBasicAuth
 from flask import Flask, jsonify
 import datetime
 import os
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import (SQLAlchemy)
 from models import Reuniao, db
 
 # Configurações globais do Zoom
