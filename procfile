@@ -1,1 +1,1 @@
-gunicorn --bind 0.0.0.0:5000 gerareuniao:app
+web: gunicorn --bind 0.0.0.0:$PORT gerareuniao:app
