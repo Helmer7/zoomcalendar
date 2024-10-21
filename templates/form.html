@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Reunião no Zoom</title>
+</head>
+<body>
+    <h1>Criar Reunião no Zoom</h1>
+    <form id="reuniaoForm" action="/criar-reuniao" method="POST">
+        <label for="topic">Nome da Reunião:</label><br>
+        <input type="text" id="topic" name="topic" required><br><br>
+
+        <label for="start_time">Data e Hora de Início:</label><br>
+        <input type="datetime-local" id="start_time" name="start_time" required><br><br>
+
+        <label for="duration">Duração (em minutos):</label><br>
+        <input type="number" id="duration" name="duration" required><br><br>
+
+        <label for="agenda">Agenda:</label><br>
+        <textarea id="agenda" name="agenda"></textarea><br><br>
+
+        <input type="submit" value="Criar Reunião">
+    </form>
+    <div id="resultado"></div>
+</body>
+</html>

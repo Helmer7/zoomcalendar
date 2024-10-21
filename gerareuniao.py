@@ -1,6 +1,6 @@
 import requests
 from requests.auth import HTTPBasicAuth
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request, render_template
 import datetime
 import os
 from flask_sqlalchemy import SQLAlchemy
@@ -17,7 +17,7 @@ account_id = os.getenv("ZOOM_ACCOUNT_ID", "JoFnTUNXSBacV9W36l3lZA")
 app = Flask(__name__)
 
 # Configuração do banco de dados
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:KKnSFofUTdzryLUGzOcTSbuswOjDCyoJ@autorack.proxy.rlwy.net:36990/railway'  # Caminho do banco de dados
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:KKnSFofUTdzryLUGzOcTSbuswOjDCyoJ@autorack.proxy.rlwy.net:36990/railway'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
@@ -47,18 +47,15 @@ def gerar_token():
         print(f"Erro {response.status_code}: {response.text}")
         raise Exception("Não foi possível gerar o token")
 
-
 # Função para verificar se o token ainda é válido
 def verificar_token():
     if access_token is None or token_expiration <= datetime.datetime.now():
         gerar_token()
 
-
 # Verificar se a reunião já existe no banco de dados
 def verificar_reuniao_existente(topic, start_time, duration):
     reuniao_existente = Reuniao.query.filter_by(topic=topic, start_time=start_time, duration=duration).first()
     return reuniao_existente
-
 
 # Função para criar a reunião no Zoom
 def criar_reuniao_zoom(topic, start_time, duration, agenda):
@@ -89,25 +86,29 @@ def criar_reuniao_zoom(topic, start_time, duration, agenda):
         print(f"Erro ao criar reunião: {response.status_code} - {response.text}")
         raise Exception(f"Erro ao criar reunião: {response.status_code} - {response.text}")
 
+# Rota para servir o formulário HTML
+@app.route('/form')
+def form_reuniao():
+    return render_template('form.html')
 
-# Rota principal para criar reunião automática
-@app.route('/')
-def criar_reuniao_automatica():
+# Rota principal para criar reunião automática via formulário
+@app.route('/criar-reuniao', methods=['POST'])
+def criar_reuniao():
     try:
-        # Parâmetros da reunião
-        topic = "Reunião Automática"
-        start_time = (datetime.datetime.now() + datetime.timedelta(minutes=5)).isoformat()
-        duration = 30
-        agenda = "Agenda da reunião automática"
-        
+        # Capturando os dados enviados pelo formulário
+        topic = request.form.get('topic')
+        start_time = request.form.get('start_time')
+        duration = int(request.form.get('duration'))
+        agenda = request.form.get('agenda')
+
         # Verificar se a reunião já existe
         reuniao_existente = verificar_reuniao_existente(topic, start_time, duration)
         if reuniao_existente:
             return jsonify({"join_url": reuniao_existente.join_url})
-        
+
         # Criar nova reunião no Zoom
         join_url = criar_reuniao_zoom(topic, start_time, duration, agenda)
-        
+
         # Salvar a nova reunião no banco de dados
         nova_reuniao = Reuniao(topic=topic, start_time=start_time, duration=duration, join_url=join_url)
         db.session.add(nova_reuniao)
@@ -116,7 +117,6 @@ def criar_reuniao_automatica():
         return jsonify({"join_url": join_url})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 
 # Inicializar banco de dados e criar tabelas (somente na primeira execução)
 with app.app_context():
