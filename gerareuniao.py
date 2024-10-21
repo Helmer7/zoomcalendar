@@ -5,6 +5,10 @@ import datetime
 import os
 from flask_sqlalchemy import SQLAlchemy
 from models import Reuniao, db
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app)
 
 # Configurações globais do Zoom
 access_token = None
