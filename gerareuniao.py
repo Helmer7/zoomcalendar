@@ -18,7 +18,7 @@ account_id = os.getenv("ZOOM_ACCOUNT_ID", "JoFnTUNXSBacV9W36l3lZA")
 app = Flask(__name__)
 
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'  
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("postgresql://postgres:KKnSFofUTdzryLUGzOcTSbuswOjDCyoJ@postgres.railway.internal:5432/railway")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
