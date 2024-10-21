@@ -1,6 +1,6 @@
 import requests
 from requests.auth import HTTPBasicAuth
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, request, render_template, redirect, url_for
 import datetime
 import os
 from flask_sqlalchemy import SQLAlchemy
@@ -85,6 +85,11 @@ def criar_reuniao_zoom(topic, start_time, duration, agenda):
     else:
         print(f"Erro ao criar reunião: {response.status_code} - {response.text}")
         raise Exception(f"Erro ao criar reunião: {response.status_code} - {response.text}")
+
+# Rota para a página principal que redireciona para o formulário
+@app.route('/')
+def index():
+    return redirect(url_for('form_reuniao'))
 
 # Rota para servir o formulário HTML
 @app.route('/form')
