@@ -5,6 +5,8 @@ import datetime
 import os
 from flask_sqlalchemy import SQLAlchemy
 from models import Reuniao, db
+from urllib.parse import quote as url_quote
+
 
 # Configurações globais do Zoom
 access_token = None
