@@ -1,1 +1,1 @@
-web: python gerareuniao.py
+web: gunicorn gerareuniao:app
