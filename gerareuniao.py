@@ -8,8 +8,11 @@ from models import Reuniao, db
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)
 
+# Configurando CORS para permitir acessos específicos
+CORS(app, resources={r"/*": {"origins": "*"}})
+
+# Configurações de variáveis
 access_token = None
 token_expiration = None
 
