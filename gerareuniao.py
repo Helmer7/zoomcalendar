@@ -95,7 +95,7 @@ def index():
 # Rota para servir o formulário HTML
 @app.route('/form')
 def form_reuniao():
-    return render_template('form.html')
+    return render_template('index.html')
 
 # Rota principal para criar reunião manualmente via formulário
 @app.route('/criar-reuniao', methods=['POST'])
