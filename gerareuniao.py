@@ -10,7 +10,7 @@ from flask_cors import CORS
 app = Flask(__name__)
 
 # Configurando CORS para permitir acessos específicos
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app, resources={r"/*": {"origins": ["https://digitalskills.brightspace.com"]}})
 
 # Configurações de variáveis
 access_token = None
