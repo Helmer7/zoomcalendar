@@ -2,7 +2,7 @@
   "builds": [
     {
       "src": "gerareuniao.py",
-      "use": "@vercel"
+      "use": "@vercel/python"
     }
   ],
   "routes": [
