@@ -4,30 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Criar Reunião no Zoom</title>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('reuniaoForm').onsubmit = async function(event) {
-                event.preventDefault();
-                const formData = new FormData(this);
 
-                try {
-                    const response = await fetch(this.action, {
-                        method: 'POST',
-                        body: formData
-                    });
-                    const result = await response.json();
-
-                    if (response.ok) {
-                        document.getElementById('resultado').innerHTML = `Reunião criada com sucesso! Link: <a href="${result.join_url}" target="_blank">${result.join_url}</a>`;
-                    } else {
-                        document.getElementById('resultado').innerHTML = `Erro: ${result.error}`;
-                    }
-                } catch (error) {
-                    document.getElementById('resultado').innerHTML = `Erro na requisição: ${error.message}`;
-                }
-            };
-        });
-    </script>
 </head>
 <body>
     <h1>Criar Reunião no Zoom</h1>
@@ -48,4 +25,29 @@
     </form>
     <div id="resultado"></div>
 </body>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('reuniaoForm').onsubmit = async function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+
+            try {
+                const response = await fetch(this.action, {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('resultado').innerHTML = `Reunião criada com sucesso! Link: <a href="${result.join_url}" target="_blank">${result.join_url}</a>`;
+                } else {
+                    document.getElementById('resultado').innerHTML = `Erro: ${result.error}`;
+                }
+            } catch (error) {
+                document.getElementById('resultado').innerHTML = `Erro na requisição: ${error.message}`;
+            }
+        };
+    });
+</script>
 </html>
