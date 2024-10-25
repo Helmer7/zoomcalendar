@@ -116,17 +116,17 @@ def criar_reuniao():
         join_url = criar_reuniao_zoom(topic, start_time, duration, agenda)
 
         # Salvar a nova reunião no banco de dados
-        nova_reuniao = Reuniao(topic=topic, start_time=start_time, duration=duration, join_url=join_url)
-        db.session.add(nova_reuniao)
-        db.session.commit()
+        # nova_reuniao = Reuniao(topic=topic, start_time=start_time, duration=duration, join_url=join_url)
+        # db.session.add(nova_reuniao)
+        # db.session.commit()
 
         return jsonify({"join_url": join_url})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 # Inicializar banco de dados e criar tabelas (somente na primeira execução)
-with app.app_context():
-    db.create_all()
+# with app.app_context():
+#     db.create_all()
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
