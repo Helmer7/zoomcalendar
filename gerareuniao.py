@@ -6,7 +6,6 @@ import os
 from flask_sqlalchemy import SQLAlchemy
 from models import Reuniao, db
 from flask_cors import CORS
-import pytz
 
 app = Flask(__name__)
 CORS(app)
@@ -62,20 +61,14 @@ def verificar_reuniao_existente(topic, start_time, duration):
 # Função para criar a reunião no Zoom
 def criar_reuniao_zoom(topic, start_time, duration, agenda):
     verificar_token()
-    
-    # Convertendo start_time para UTC
-    local_time = datetime.datetime.strptime(start_time, "%Y-%m-%dT%H:%M")
-    local_time = pytz.timezone("America/Sao_Paulo").localize(local_time)
-    utc_time = local_time.astimezone(pytz.utc)
-    start_time_iso = utc_time.strftime("%Y-%m-%dT%H:%M:%SZ")
-
     url = "https://api.zoom.us/v2/users/me/meetings"
     
     dados_reuniao = {
         "topic": topic,
         "type": 2,
-        "start_time": start_time_iso,  # start_time em UTC no formato ISO 8601
+        "start_time": start_time,
         "duration": duration,
+        "timezone": "America/Sao_Paulo",
         "agenda": agenda
     }
 
