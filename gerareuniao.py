@@ -6,7 +6,7 @@ import os
 from flask_sqlalchemy import SQLAlchemy
 from models import Reuniao, db
 from flask_cors import CORS
-import pytz  # Biblioteca para lidar com fusos horários
+import pytz
 
 app = Flask(__name__)
 CORS(app)
@@ -63,29 +63,18 @@ def verificar_reuniao_existente(topic, start_time, duration):
 def criar_reuniao_zoom(topic, start_time, duration, agenda):
     verificar_token()
     
-    # Processando o start_time para UTC
-    try:
-        # Converte o start_time para o formato datetime
-        local_time = datetime.datetime.strptime(start_time, "%Y-%m-%dT%H:%M")
-        
-        # Define o fuso horário "America/Sao_Paulo"
-        local_time = pytz.timezone("America/Sao_Paulo").localize(local_time)
-        
-        # Converte para UTC
-        utc_time = local_time.astimezone(pytz.utc)
-        
-        # Converte para string ISO 8601 sem especificação de fuso
-        start_time_iso = utc_time.strftime("%Y-%m-%dT%H:%M:%SZ")  # formato UTC sem offset
-    except ValueError as e:
-        print(f"Erro ao processar o horário: {e}")
-        raise Exception("Formato de data e hora inválido.")
+    # Convertendo start_time para UTC
+    local_time = datetime.datetime.strptime(start_time, "%Y-%m-%dT%H:%M")
+    local_time = pytz.timezone("America/Sao_Paulo").localize(local_time)
+    utc_time = local_time.astimezone(pytz.utc)
+    start_time_iso = utc_time.strftime("%Y-%m-%dT%H:%M:%SZ")
 
     url = "https://api.zoom.us/v2/users/me/meetings"
     
     dados_reuniao = {
         "topic": topic,
         "type": 2,
-        "start_time": start_time_iso,  # Agora o start_time está em UTC no formato ISO 8601
+        "start_time": start_time_iso,  # start_time em UTC no formato ISO 8601
         "duration": duration,
         "agenda": agenda
     }
