@@ -1,3 +1,4 @@
+import pytz
 import requests
 from requests.auth import HTTPBasicAuth
 from flask import Flask, jsonify, request, render_template, redirect, url_for
@@ -53,22 +54,33 @@ def verificar_token():
     if access_token is None or token_expiration <= datetime.datetime.now():
         gerar_token()
 
-# Verificar se a reunião já existe no banco de dados
+     # Verificar se a reunião já existe no banco de dados
 def verificar_reuniao_existente(topic, start_time, duration):
     reuniao_existente = Reuniao.query.filter_by(topic=topic, start_time=start_time, duration=duration).first()
     return reuniao_existente
 
-# Função para criar a reunião no Zoom
+      # Função para criar a reunião no Zoom
 def criar_reuniao_zoom(topic, start_time, duration, agenda):
     verificar_token()
+    
+    # Converte o start_time para UTC no formato ISO 8601
+    try:
+        # Converte o horário do formulário (America/Sao_Paulo) para UTC
+        local_time = datetime.datetime.strptime(start_time, "%Y-%m-%dT%H:%M")
+        local_time = pytz.timezone("America/Sao_Paulo").localize(local_time)
+        utc_time = local_time.astimezone(pytz.utc)
+        start_time_iso = utc_time.strftime("%Y-%m-%dT%H:%M:%SZ")  # formato ISO 8601 no horário UTC
+    except ValueError as e:
+        print(f"Erro ao processar o horário: {e}")
+        raise Exception("Formato de data e hora inválido.")
+
     url = "https://api.zoom.us/v2/users/me/meetings"
     
     dados_reuniao = {
         "topic": topic,
         "type": 2,
-        "start_time": start_time,
+        "start_time": start_time_iso,  # Enviando o horário em UTC para o Zoom
         "duration": duration,
-        "timezone": "America/Sao_Paulo",
         "agenda": agenda
     }
 
